@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.7-alpine
 
 WORKDIR /app
 
@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 # COPY . /app
 
-CMD [ "python", "app.py" ]
+CMD [ "flask", "run"]
