@@ -7,7 +7,6 @@ from security import authenticate, identity
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = environ['JWT_SECRET']
-app.config['JWT_AUTH_URL_RULE'] = '/login'
 
 api = Api(app)
 
