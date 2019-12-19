@@ -16,6 +16,13 @@ items = []
 
 
 class Item(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('price',
+                         type=float,
+                         required=True,
+                         help='Price is required!'
+                         )
+
     @jwt_required()
     def get(self, name):
         item = next(filter(lambda x: x['name'] == name, items), None)
@@ -25,14 +32,7 @@ class Item(Resource):
         if next(filter(lambda x: x['name'] == name, items), None):
             return {'message': f'An item with name {name} exists already'}, 400
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('price',
-                            type=float,
-                            required=True,
-                            help='Price is required!'
-                            )
-
-        data = parser.parse_args()
+        data = Item.parser.parse_args()
 
         item = {'name': name, 'price': data['price']}
         items.append(item)
@@ -44,14 +44,7 @@ class Item(Resource):
         return {'message': 'Item deleted'}
 
     def put(self, name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('price',
-                            type=float,
-                            required=True,
-                            help='Price is required!'
-                            )
-
-        data = parser.parse_args()
+        data = Item.parser.parse_args()
 
         item = next(filter(lambda x: x['name'] == name, items), None)
         if item is None:
