@@ -1,16 +1,24 @@
 version: "3.5"
 
 services:
-  flask_api:
-    container_name: flask_api
-    build: ./app
+  # flask_api:
+  #   container_name: flask_api
+  #   build: ./app
+  #   volumes:
+  #     - "./app/:/app"
+  #   ports:
+  #     - "5000:5000"
+
+  flask_resful_docker:
+    container_name: flask_resful_docker
+    build: ./flask-restful-docker
     volumes:
-      - "./app/:/app"
+      - "./flask-restful-docker/:/app"
     ports:
       - "5000:5000"
 
-  log_monitor:
-    container_name: log_monitor
+  flask_log_monitor:
+    container_name: flask_log_monitor
     restart: unless-stopped
     image: amir20/dozzle:latest
     environment:
