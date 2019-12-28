@@ -13,6 +13,13 @@ class Item(Resource):
 
     @jwt_required()
     def get(self, name):
+        item = Item.find_by_name(name)
+        if item:
+            return item, 200
+        return {'message': f'An item with name {name} does not exist'}, 404
+
+    @classmethod
+    def find_by_name(cls, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -23,17 +30,24 @@ class Item(Resource):
         connection.close()
 
         if row:
-            return {'item': {'name': row[0], 'price': row[1]}}, 200
-        return {'message': f'An item with name {name} does not exist'}, 404
+            return {'item': {'name': row[0], 'price': row[1]}}
 
     def post(self, name):
-        if next(filter(lambda x: x['name'] == name, items), None):
+        if Item.find_by_name(name):
             return {'message': f'An item with name {name} exists already'}, 400
 
         data = Item.parser.parse_args()
 
         item = {'name': name, 'price': data['price']}
-        items.append(item)
+
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+        query = "INSERT INTO items VALUES (?, ?)"
+        cursor.execute(query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
+
         return item, 201
 
     def delete(self, name):
