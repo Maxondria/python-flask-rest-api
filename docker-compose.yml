@@ -9,15 +9,31 @@ services:
   #   ports:
   #     - "5000:5000"
 
-  flask_resful_docker:
-    container_name: flask_resful_docker
-    build: ./flask-restful-docker
+  # flask_resful_docker:
+  #   container_name: flask_resful_docker
+  #   build: ./flask-restful-docker
+  #   volumes:
+  #     - "./flask-restful-docker/:/app"
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     JWT_SECRET: ${JWT_SECRET:-some_secret_jwt_key}
+
+  flask_db_docker:
+    container_name: flask_db_docker
+    build: ./flask-db-docker
     volumes:
-      - "./flask-restful-docker/:/app"
+      - "./flask-db-docker/:/app"
     ports:
       - "5000:5000"
+    depends_on:
+      - mysql
     environment:
       JWT_SECRET: ${JWT_SECRET:-some_secret_jwt_key}
+      MYSQL_HOST: ${MYSQL_HOST:-localhost}
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+      MYSQL_DB: ${MYSQL_DB:-flask_restful}
 
   flask_log_monitor:
     container_name: flask_log_monitor
@@ -29,3 +45,29 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8080:8080
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7.21
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+
+volumes:
+  mysql_data:
