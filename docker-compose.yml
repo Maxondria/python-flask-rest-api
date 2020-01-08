@@ -19,11 +19,27 @@ services:
   #   environment:
   #     JWT_SECRET: ${JWT_SECRET:-some_secret_jwt_key}
 
-  flask_db_docker:
-    container_name: flask_db_docker
-    build: ./flask-db-docker
+  # flask_db_docker:
+  #   container_name: flask_db_docker
+  #   build: ./flask-db-docker
+  #   volumes:
+  #     - "./flask-db-docker/:/app"
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - mysql
+  #   environment:
+  #     JWT_SECRET: ${JWT_SECRET:-some_secret_jwt_key}
+  #     MYSQL_HOST: ${MYSQL_HOST:-localhost}
+  #     MYSQL_USER: ${MYSQL_USER:-root}
+  #     MYSQL_PASSWORD: ${MYSQL_PASSWORD:-root}
+  #     MYSQL_DB: ${MYSQL_DB:-flask_restful}
+
+  flask_sqlalchemy:
+    container_name: flask_sqlalchemy
+    build: ./flask-sqlalchemy
     volumes:
-      - "./flask-db-docker/:/app"
+      - "./flask-sqlalchemy/:/app"
     ports:
       - "5000:5000"
     depends_on:
