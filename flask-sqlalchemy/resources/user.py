@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse
 from models.user import UserModel
+from blacklist import BLACKLIST
 from flask_jwt_extended import (create_access_token,
                                 create_refresh_token,
                                 jwt_required,
                                 get_jwt_identity,
+                                get_raw_jwt,
                                 jwt_refresh_token_required)
 
 _user_parser = reqparse.RequestParser()
@@ -62,6 +64,15 @@ class UserLogin(Resource):
             refresh_token = create_refresh_token(user.id)
             return {'access_token': access_token, 'refresh_token': refresh_token}, 200
         return {'message': 'Invalid credentials provided'}, 401
+
+
+class UserLogout(Resource):
+    @jwt_required
+    def post(self):
+        # JWT id, A unique identfier for the token
+        jti = get_raw_jwt()['jti']
+        BLACKLIST.add(jti)
+        return {'message': 'Successfully logged out'}, 200
 
 
 class TokenRefresh(Resource):
