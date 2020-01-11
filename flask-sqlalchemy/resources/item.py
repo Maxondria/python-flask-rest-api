@@ -1,6 +1,6 @@
-from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
 from models.item import ItemModel
+from flask_jwt_extended import jwt_required
 
 
 class Item(Resource):
@@ -16,14 +16,14 @@ class Item(Resource):
                         help='Store ID is required!!'
                         )
 
-    @jwt_required()
+    @jwt_required
     def get(self, name):
         item = ItemModel.find_by_name(name)
         if item:
             return item.json(), 200
         return {'message': f'An item with name {name} does not exist'}, 404
 
-    @jwt_required()
+    @jwt_required
     def post(self, name):
         if ItemModel.find_by_name(name):
             return {'message': f'An item with name {name} exists already'}, 400
@@ -39,7 +39,7 @@ class Item(Resource):
 
         return item.json(), 201
 
-    @jwt_required()
+    @jwt_required
     def delete(self, name):
         item = ItemModel.find_by_name(name)
         if item:
@@ -47,7 +47,7 @@ class Item(Resource):
             return {'message': 'Item deleted'}
         return {'message': 'Item not found'}
 
-    @jwt_required()
+    @jwt_required
     def put(self, name):
         data = Item.parser.parse_args()
 
@@ -63,6 +63,5 @@ class Item(Resource):
 
 
 class ItemList(Resource):
-    @jwt_required()
     def get(self):
         return {'items': [item.json() for item in ItemModel.find_all()]}
