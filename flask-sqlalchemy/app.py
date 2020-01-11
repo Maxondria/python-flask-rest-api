@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from os import environ
 from db import db
+from blacklist import BLACKLIST
 
 from resources.user import UserRegister, User, UserLogin, TokenRefresh
 from resources.item import Item, ItemList
@@ -14,6 +15,8 @@ app.config['JWT_SECRET_KEY'] = environ['JWT_SECRET']
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@mysql/flask_restful'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
 db.init_app(app)
 
@@ -35,6 +38,11 @@ def add_claims_to_jwt(identity):
     if identity == 1:
         return {'is_admin': True}
     return {'is_admin': False}
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_blacklist(decrypted_token):
+    return decrypted_token['identity'] in BLACKLIST
 
 # detect expiration of tokens
 @jwt.expired_token_loader
@@ -70,7 +78,7 @@ def fresh_token_callback(error):
 
 
 @jwt.revoked_token_loader
-def revoked_token_callback(error):
+def revoked_token_callback():
     return jsonify({
         'description': 'Please contact admin',
         'error': 'token_revoked'
