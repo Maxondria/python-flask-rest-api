@@ -14,6 +14,7 @@ app.config['SECRET_KEY'] = environ['JWT_SECRET']
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@mysql/flask_restful'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 db.init_app(app)
 
