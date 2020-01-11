@@ -36,6 +36,46 @@ def add_claims_to_jwt(identity):
         return {'is_admin': True}
     return {'is_admin': False}
 
+# detect expiration of tokens
+@jwt.expired_token_loader
+def expired_token_callback():
+    return jsonify({
+        'description': 'The token has expired',
+        'error': 'token_expired'
+    }), 401
+
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        'description': 'Signature verification failed',
+        'error': 'invalid_token'
+    }), 401
+
+
+@jwt.unauthorized_loader
+def unauthorized_callback(error):
+    return jsonify({
+        'description': 'No signature was found in request',
+        'error': 'user_unauthorized'
+    }), 401
+
+
+@jwt.needs_fresh_token_loader
+def fresh_token_callback(error):
+    return jsonify({
+        'description': 'Please login again',
+        'error': 'fresh_token_required'
+    }), 401
+
+
+@jwt.revoked_token_loader
+def revoked_token_callback(error):
+    return jsonify({
+        'description': 'Please contact admin',
+        'error': 'token_revoked'
+    }), 401
+
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(Store, '/store/<string:name>')
